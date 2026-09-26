@@ -100,25 +100,26 @@ export class UIManager {
 
         <!-- Zen Auto-Float Mode -->
         <button id="btn-float" class="control-pill" title="Zen Float Mode: Hands-free calm descent (F)">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="m9 12 2 2 4-4"/></svg>
-          <span class="pill-label">Zen Float</span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="m9 12 2 2 4-4"/></svg>
+          <span class="pill-label">Float</span>
         </button>
 
         <!-- Breath Companion Pacer -->
         <button id="btn-breath" class="control-pill" title="Mindful Breath Pacer (B)">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="8" stroke-dasharray="2 3"/></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="8" stroke-dasharray="2 3"/></svg>
           <span class="pill-label">Breathe</span>
         </button>
 
         <!-- Sound Engine Controls (Muted by default) -->
         <div class="control-dropdown-wrap">
           <button id="btn-sound" class="control-pill" title="108Hz Harmonic Ambient Drone (M) - Click to un-mute">
-            <svg id="sound-icon-muted" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
-            <svg id="sound-icon-playing" class="hidden" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
-            <span class="pill-label">Drone 108Hz</span>
+            <svg id="sound-icon-muted" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
+            <svg id="sound-icon-playing" class="hidden" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
+            <span class="pill-label">Sound</span>
           </button>
           <div id="sound-menu" class="dropdown-popover hidden">
             <div class="popover-title">Harmonic Soundscape</div>
+            <button id="btn-toggle-sound-mute" class="sound-mute-action-btn" type="button">Unmute Audio</button>
             <div class="volume-slider-row">
               <span class="slider-label">Volume</span>
               <input type="range" id="sound-vol-slider" min="0" max="1" step="0.01" value="0.5" />
@@ -135,7 +136,7 @@ export class UIManager {
         <div class="control-dropdown-wrap">
           <button id="btn-theme" class="control-pill" title="Switch Theme (T)">
             <span class="theme-swatch void"></span>
-            <span class="pill-label">Void</span>
+            <span class="pill-label">Theme</span>
           </button>
           <div id="theme-menu" class="dropdown-popover hidden">
             <div class="popover-title">Visual Palette</div>
@@ -165,8 +166,8 @@ export class UIManager {
 
         <!-- Milestones Drawer Toggle -->
         <button id="btn-milestones" class="control-pill" title="Milestone Atlas">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-          <span class="pill-label">Atlas (<span id="milestone-count">0</span>)</span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+          <span class="pill-label">Atlas <span id="milestone-count">(0)</span></span>
         </button>
       </nav>
 
@@ -264,13 +265,33 @@ export class UIManager {
   }
 
   private setupListeners() {
-    // 1. Sound toggle
-    this.soundBtn.addEventListener('click', async () => {
+    // 1. Sound toggle & quick settings
+    const toggleSoundMute = async () => {
       const isUnmuted = await this.soundEngine.toggleMute();
       this.updateSoundIcon(isUnmuted);
+      const muteBtn = document.querySelector('#btn-toggle-sound-mute');
+      if (muteBtn) {
+        muteBtn.textContent = isUnmuted ? 'Mute Audio' : 'Unmute Audio';
+      }
+      return isUnmuted;
+    };
+
+    this.soundBtn.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      if (this.soundEngine.getIsMuted()) {
+        await toggleSoundMute();
+        this.soundMenu.classList.remove('hidden');
+      } else {
+        this.soundMenu.classList.toggle('hidden');
+      }
     });
 
-    // Sound menu hover/toggle
+    document.querySelector('#btn-toggle-sound-mute')?.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      await toggleSoundMute();
+    });
+
+    // Sound menu right-click / contextmenu
     this.soundBtn.addEventListener('contextmenu', (e) => {
       e.preventDefault();
       this.soundMenu.classList.toggle('hidden');
@@ -358,8 +379,8 @@ export class UIManager {
       }
     });
 
-    // Close menus on outside click
-    document.addEventListener('click', (e) => {
+    // Close menus on outside click / tap
+    const handleOutsideClick = (e: Event) => {
       const target = e.target as HTMLElement;
       if (!target.closest('#btn-theme') && !target.closest('#theme-menu')) {
         this.themeMenu.classList.add('hidden');
@@ -367,7 +388,9 @@ export class UIManager {
       if (!target.closest('#btn-sound') && !target.closest('#sound-menu')) {
         this.soundMenu.classList.add('hidden');
       }
-    });
+    };
+    document.addEventListener('click', handleOutsideClick);
+    document.addEventListener('pointerdown', handleOutsideClick);
 
     // Keyboard shortcuts
     window.addEventListener('keydown', (e: KeyboardEvent) => {
@@ -401,11 +424,27 @@ export class UIManager {
         if (this.physicsEngine.getVelocity() > 0.4) {
           document.body.classList.add('ui-soften');
         }
-      }, 2500);
+      }, 3500);
     };
 
     window.addEventListener('mousemove', onUserActive, { passive: true });
+    window.addEventListener('pointermove', onUserActive, { passive: true });
     window.addEventListener('touchstart', onUserActive, { passive: true });
+    window.addEventListener('touchmove', onUserActive, { passive: true });
+    window.addEventListener('touchend', onUserActive, { passive: true });
+    window.addEventListener('wheel', onUserActive, { passive: true });
+
+    // Hide first-time scroll hint after moving or interacting
+    const hideHint = () => {
+      const hint = document.querySelector('#scroll-hint');
+      if (hint && !hint.classList.contains('faded')) {
+        hint.classList.add('faded');
+      }
+    };
+
+    window.addEventListener('touchstart', hideHint, { once: true, passive: true });
+    window.addEventListener('wheel', hideHint, { once: true, passive: true });
+    window.addEventListener('mousedown', hideHint, { once: true, passive: true });
 
     // Milestone discovery listener
     this.milestoneManager.onDiscovery((landmark) => {
@@ -448,10 +487,8 @@ export class UIManager {
     document.documentElement.style.setProperty('--card-bg', theme.cardBg);
     document.documentElement.style.setProperty('--card-border', theme.cardBorder);
 
-    // Update active theme button label
-    const label = this.themeBtn.querySelector('.pill-label');
+    // Update active theme swatch
     const swatch = this.themeBtn.querySelector('.theme-swatch');
-    if (label) label.textContent = theme.name;
     if (swatch) {
       swatch.className = `theme-swatch ${theme.id}`;
     }
@@ -542,17 +579,23 @@ export class UIManager {
     }
 
     // 5. Hide first-time scroll hint after moving
-    if (depthMeters > 3) {
+    if (depthMeters > 0.2) {
       const hint = document.querySelector('#scroll-hint');
-      if (hint) hint.classList.add('faded');
+      if (hint && !hint.classList.contains('faded')) {
+        hint.classList.add('faded');
+      }
+    }
+
+    // Restore full UI opacity when slow or resting
+    if (Math.abs(velocity) < 0.2 && document.body.classList.contains('ui-soften')) {
+      document.body.classList.remove('ui-soften');
     }
   }
 
   private updateMilestoneCount() {
     const discovered = this.milestoneManager.getDiscoveredLandmarks().length;
-    const total = this.milestoneManager.getAllMilestones().length;
     const countEl = document.querySelector('#milestone-count');
-    if (countEl) countEl.textContent = `${discovered}/${total}`;
+    if (countEl) countEl.textContent = `(${discovered})`;
   }
 
   private populateMilestoneDrawer() {
