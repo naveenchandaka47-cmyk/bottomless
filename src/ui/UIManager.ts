@@ -31,6 +31,7 @@ export class UIManager {
   private milestonesBtn!: HTMLButtonElement;
   private milestonesDrawer!: HTMLElement;
   private philosophyModal!: HTMLElement;
+  private popoverBackdrop!: HTMLElement;
 
   private idleTimeoutId: number | null = null;
 
@@ -91,7 +92,7 @@ export class UIManager {
       </header>
 
       <!-- Bottom Floating Control Center -->
-      <nav id="bottom-controls" class="floating-controls-bar">
+      <nav id="bottom-controls" class="floating-controls-bar interactive-ui">
         <!-- Return to Surface Pill -->
         <button id="btn-return" class="control-pill hidden" title="Return to Surface (Home)">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
@@ -111,58 +112,17 @@ export class UIManager {
         </button>
 
         <!-- Sound Engine Controls (Muted by default) -->
-        <div class="control-dropdown-wrap">
-          <button id="btn-sound" class="control-pill" title="108Hz Harmonic Ambient Drone (M) - Click to un-mute">
-            <svg id="sound-icon-muted" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
-            <svg id="sound-icon-playing" class="hidden" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
-            <span class="pill-label">Sound</span>
-          </button>
-          <div id="sound-menu" class="dropdown-popover hidden">
-            <div class="popover-title">Harmonic Soundscape</div>
-            <button id="btn-toggle-sound-mute" class="sound-mute-action-btn" type="button">Unmute Audio</button>
-            <div class="volume-slider-row">
-              <span class="slider-label">Volume</span>
-              <input type="range" id="sound-vol-slider" min="0" max="1" step="0.01" value="0.5" />
-            </div>
-            <div class="preset-buttons-row">
-              <button class="preset-btn active" data-preset="harmonic108">108Hz Harmonic</button>
-              <button class="preset-btn" data-preset="singingBowl">Singing Bowl</button>
-              <button class="preset-btn" data-preset="deepAbyss">Deep Abyss</button>
-            </div>
-          </div>
-        </div>
+        <button id="btn-sound" class="control-pill" title="108Hz Harmonic Ambient Drone (M) - Click to un-mute / configure">
+          <svg id="sound-icon-muted" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
+          <svg id="sound-icon-playing" class="hidden" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
+          <span class="pill-label">Sound</span>
+        </button>
 
         <!-- Themes Switcher (Void by default) -->
-        <div class="control-dropdown-wrap">
-          <button id="btn-theme" class="control-pill" title="Switch Theme (T)">
-            <span class="theme-swatch void"></span>
-            <span class="pill-label">Theme</span>
-          </button>
-          <div id="theme-menu" class="dropdown-popover hidden">
-            <div class="popover-title">Visual Palette</div>
-            <button class="theme-select-btn" data-theme="mist">
-              <span class="swatch-preview mist"></span>
-              <div class="theme-info">
-                <strong>Mist</strong>
-                <span>Warm eggshell daylight</span>
-              </div>
-            </button>
-            <button class="theme-select-btn" data-theme="tide">
-              <span class="swatch-preview tide"></span>
-              <div class="theme-info">
-                <strong>Tide</strong>
-                <span>Coastal oceanic seafoam</span>
-              </div>
-            </button>
-            <button class="theme-select-btn active" data-theme="void">
-              <span class="swatch-preview void"></span>
-              <div class="theme-info">
-                <strong>Void</strong>
-                <span>Matte OLED starlight</span>
-              </div>
-            </button>
-          </div>
-        </div>
+        <button id="btn-theme" class="control-pill" title="Switch Theme (T)">
+          <span class="theme-swatch void"></span>
+          <span class="pill-label">Theme</span>
+        </button>
 
         <!-- Milestones Drawer Toggle -->
         <button id="btn-milestones" class="control-pill" title="Milestone Atlas">
@@ -170,6 +130,56 @@ export class UIManager {
           <span class="pill-label">Atlas <span id="milestone-count">(0)</span></span>
         </button>
       </nav>
+
+      <!-- Dismissible Backdrop for Popovers -->
+      <div id="popover-backdrop" class="popover-backdrop hidden"></div>
+
+      <!-- Sound Engine Controls Popover (Direct child of #app for flawless hit testing) -->
+      <div id="sound-menu" class="dropdown-popover hidden interactive-ui" role="dialog" aria-label="Sound Settings">
+        <div class="popover-header">
+          <span class="popover-title">Harmonic Soundscape</span>
+          <button class="popover-close-btn" aria-label="Close">✕</button>
+        </div>
+        <button id="btn-toggle-sound-mute" class="sound-mute-action-btn" type="button">Unmute Audio</button>
+        <div class="volume-slider-row">
+          <span class="slider-label">Volume</span>
+          <input type="range" id="sound-vol-slider" min="0" max="1" step="0.01" value="0.5" />
+        </div>
+        <div class="preset-buttons-row">
+          <button class="preset-btn active" data-preset="harmonic108">108Hz Harmonic</button>
+          <button class="preset-btn" data-preset="singingBowl">Singing Bowl</button>
+          <button class="preset-btn" data-preset="deepAbyss">Deep Abyss</button>
+        </div>
+      </div>
+
+      <!-- Themes Switcher Popover (Direct child of #app for flawless hit testing) -->
+      <div id="theme-menu" class="dropdown-popover hidden interactive-ui" role="dialog" aria-label="Theme Palette">
+        <div class="popover-header">
+          <span class="popover-title">Visual Palette</span>
+          <button class="popover-close-btn" aria-label="Close">✕</button>
+        </div>
+        <button class="theme-select-btn" data-theme="mist">
+          <span class="swatch-preview mist"></span>
+          <div class="theme-info">
+            <strong>Mist</strong>
+            <span>Warm eggshell daylight</span>
+          </div>
+        </button>
+        <button class="theme-select-btn" data-theme="tide">
+          <span class="swatch-preview tide"></span>
+          <div class="theme-info">
+            <strong>Tide</strong>
+            <span>Coastal oceanic seafoam</span>
+          </div>
+        </button>
+        <button class="theme-select-btn active" data-theme="void">
+          <span class="swatch-preview void"></span>
+          <div class="theme-info">
+            <strong>Void</strong>
+            <span>Matte OLED starlight</span>
+          </div>
+        </button>
+      </div>
 
       <!-- First Interaction Gentle Hint -->
       <div id="scroll-hint" class="scroll-hint">
@@ -259,12 +269,68 @@ export class UIManager {
     this.milestonesBtn = document.querySelector('#btn-milestones')!;
     this.milestonesDrawer = document.querySelector('#milestone-drawer')!;
     this.philosophyModal = document.querySelector('#philosophy-modal')!;
+    this.popoverBackdrop = document.querySelector('#popover-backdrop')!;
 
     const worldContainer = document.querySelector<HTMLElement>('#world-container')!;
     this.milestoneManager.setContainer(worldContainer);
   }
 
+  private closeAllPopovers() {
+    this.soundMenu.classList.add('hidden');
+    this.themeMenu.classList.add('hidden');
+    if (this.popoverBackdrop) {
+      this.popoverBackdrop.classList.add('hidden');
+    }
+  }
+
+  private openPopover(menu: HTMLElement, anchorBtn: HTMLElement) {
+    const isAlreadyOpen = !menu.classList.contains('hidden');
+    this.closeAllPopovers();
+
+    if (!isAlreadyOpen) {
+      this.positionPopover(menu, anchorBtn);
+      menu.classList.remove('hidden');
+      if (this.popoverBackdrop) {
+        this.popoverBackdrop.classList.remove('hidden');
+      }
+    }
+  }
+
+  private positionPopover(menu: HTMLElement, anchorBtn: HTMLElement) {
+    if (window.innerWidth <= 768) {
+      menu.style.left = '50%';
+      menu.style.transform = 'translateX(-50%)';
+      menu.style.bottom = 'calc(74px + env(safe-area-inset-bottom, 12px))';
+      menu.style.top = 'auto';
+      menu.style.right = 'auto';
+    } else {
+      const rect = anchorBtn.getBoundingClientRect();
+      const menuWidth = 240;
+      let left = rect.left + rect.width / 2 - menuWidth / 2;
+      left = Math.max(16, Math.min(window.innerWidth - menuWidth - 16, left));
+      menu.style.left = `${left}px`;
+      menu.style.transform = 'none';
+      menu.style.bottom = `${window.innerHeight - rect.top + 12}px`;
+      menu.style.top = 'auto';
+      menu.style.right = 'auto';
+    }
+  }
+
   private setupListeners() {
+    // 0. Popover Backdrop & Close Buttons
+    this.popoverBackdrop.addEventListener('click', () => this.closeAllPopovers());
+    this.popoverBackdrop.addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      this.closeAllPopovers();
+    });
+
+    document.querySelectorAll('.popover-close-btn').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.closeAllPopovers();
+      });
+    });
+
     // 1. Sound toggle & quick settings
     const toggleSoundMute = async () => {
       const isUnmuted = await this.soundEngine.toggleMute();
@@ -280,32 +346,43 @@ export class UIManager {
       e.stopPropagation();
       if (this.soundEngine.getIsMuted()) {
         await toggleSoundMute();
-        this.soundMenu.classList.remove('hidden');
-      } else {
-        this.soundMenu.classList.toggle('hidden');
       }
+      this.openPopover(this.soundMenu, this.soundBtn);
     });
 
-    document.querySelector('#btn-toggle-sound-mute')?.addEventListener('click', async (e) => {
-      e.stopPropagation();
-      await toggleSoundMute();
-    });
-
-    // Sound menu right-click / contextmenu
     this.soundBtn.addEventListener('contextmenu', (e) => {
       e.preventDefault();
-      this.soundMenu.classList.toggle('hidden');
+      this.openPopover(this.soundMenu, this.soundBtn);
     });
+
+    const muteToggleBtn = document.querySelector('#btn-toggle-sound-mute');
+    if (muteToggleBtn) {
+      const onMuteToggle = async (e: Event) => {
+        e.preventDefault();
+        e.stopPropagation();
+        await toggleSoundMute();
+      };
+      muteToggleBtn.addEventListener('click', onMuteToggle);
+      muteToggleBtn.addEventListener('pointerup', onMuteToggle);
+    }
 
     // Preset selectors
     document.querySelectorAll('.preset-btn').forEach((btn) => {
-      btn.addEventListener('click', (e) => {
+      const el = btn as HTMLElement;
+      const preset = el.dataset.preset as 'harmonic108' | 'singingBowl' | 'deepAbyss';
+      let lastTrigger = 0;
+      const onSelectPreset = (e: Event) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const now = performance.now();
+        if (now - lastTrigger < 300) return;
+        lastTrigger = now;
         document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
-        const target = e.currentTarget as HTMLElement;
-        target.classList.add('active');
-        const preset = target.dataset.preset as 'harmonic108' | 'singingBowl' | 'deepAbyss';
+        el.classList.add('active');
         this.soundEngine.setPreset(preset);
-      });
+      };
+      el.addEventListener('pointerup', onSelectPreset);
+      el.addEventListener('click', onSelectPreset);
     });
 
     // Volume slider
@@ -315,6 +392,8 @@ export class UIManager {
         const val = parseFloat((e.target as HTMLInputElement).value);
         this.soundEngine.setVolume(val);
       });
+      volSlider.addEventListener('pointerdown', (e) => e.stopPropagation());
+      volSlider.addEventListener('touchstart', (e) => e.stopPropagation(), { passive: true });
     }
 
     // 2. Zen Float
@@ -330,18 +409,42 @@ export class UIManager {
     });
 
     // 4. Themes
-    this.themeBtn.addEventListener('click', () => {
-      this.themeMenu.classList.toggle('hidden');
+    this.themeBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.openPopover(this.themeMenu, this.themeBtn);
     });
 
+    const selectTheme = (mode: ThemeMode) => {
+      if (mode && THEMES[mode]) {
+        this.applyTheme(THEMES[mode]);
+        this.closeAllPopovers();
+      }
+    };
+
     document.querySelectorAll('.theme-select-btn').forEach((btn) => {
-      btn.addEventListener('click', (e) => {
-        const mode = (e.currentTarget as HTMLElement).dataset.theme as ThemeMode;
-        if (mode && THEMES[mode]) {
-          this.applyTheme(THEMES[mode]);
-          this.themeMenu.classList.add('hidden');
-        }
-      });
+      const el = btn as HTMLElement;
+      const mode = el.dataset.theme as ThemeMode;
+      let lastTrigger = 0;
+      const onSelect = (e: Event) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const now = performance.now();
+        if (now - lastTrigger < 300) return;
+        lastTrigger = now;
+        selectTheme(mode);
+      };
+      el.addEventListener('pointerup', onSelect);
+      el.addEventListener('click', onSelect);
+    });
+
+    // Window resize: reposition popovers if open
+    window.addEventListener('resize', () => {
+      if (!this.soundMenu.classList.contains('hidden')) {
+        this.positionPopover(this.soundMenu, this.soundBtn);
+      }
+      if (!this.themeMenu.classList.contains('hidden')) {
+        this.positionPopover(this.themeMenu, this.themeBtn);
+      }
     });
 
     // 5. Unit toggle (Metric m/km vs Imperial ft/mi)
@@ -379,19 +482,6 @@ export class UIManager {
       }
     });
 
-    // Close menus on outside click / tap
-    const handleOutsideClick = (e: Event) => {
-      const target = e.target as HTMLElement;
-      if (!target.closest('#btn-theme') && !target.closest('#theme-menu')) {
-        this.themeMenu.classList.add('hidden');
-      }
-      if (!target.closest('#btn-sound') && !target.closest('#sound-menu')) {
-        this.soundMenu.classList.add('hidden');
-      }
-    };
-    document.addEventListener('click', handleOutsideClick);
-    document.addEventListener('pointerdown', handleOutsideClick);
-
     // Keyboard shortcuts
     window.addEventListener('keydown', (e: KeyboardEvent) => {
       if ((e.target as HTMLElement).tagName === 'INPUT') return;
@@ -411,8 +501,7 @@ export class UIManager {
       } else if (e.key === 'Escape') {
         this.philosophyModal.classList.add('hidden');
         this.milestonesDrawer.classList.add('hidden');
-        this.themeMenu.classList.add('hidden');
-        this.soundMenu.classList.add('hidden');
+        this.closeAllPopovers();
       }
     });
 

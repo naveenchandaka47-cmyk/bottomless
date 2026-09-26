@@ -46,9 +46,9 @@ export class PhysicsEngine {
 
     // 2. Mouse Click & Drag
     window.addEventListener('mousedown', (e: MouseEvent) => {
-      // Ignore clicks on buttons/interactive UI
+      // Ignore clicks on buttons/interactive UI/popovers
       const target = e.target as HTMLElement;
-      if (target.closest('button, input, select, a, .interactive-ui')) return;
+      if (target.closest('button, input, select, a, .interactive-ui, .dropdown-popover, .popover-backdrop, .drawer, .modal-backdrop, .floating-controls-bar')) return;
 
       this.isPointerDown = true;
       this.lastPointerY = e.clientY;
@@ -101,7 +101,7 @@ export class PhysicsEngine {
       'touchstart',
       (e: TouchEvent) => {
         const target = e.target as HTMLElement;
-        if (target.closest('button, input, select, a, .interactive-ui')) return;
+        if (target.closest('button, input, select, a, .interactive-ui, .dropdown-popover, .popover-backdrop, .drawer, .modal-backdrop, .floating-controls-bar')) return;
 
         if (e.touches.length === 1) {
           this.isPointerDown = true;
