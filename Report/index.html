@@ -1,0 +1,1552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bottomless — Test Automation Extent Report</title>
+  <style>
+    :root {
+      --bg-primary: #0a0c10;
+      --bg-surface: #12161f;
+      --bg-card: #181d28;
+      --bg-card-hover: #1f2533;
+      --border-color: #272f40;
+      --border-light: #343e54;
+      --text-main: #f0f4fc;
+      --text-muted: #8b99b5;
+      --text-dim: #5c6882;
+      --accent-pass: #10b981;
+      --accent-pass-bg: rgba(16, 185, 129, 0.12);
+      --accent-fail: #ef4444;
+      --accent-fail-bg: rgba(239, 68, 68, 0.12);
+      --accent-blocked: #f59e0b;
+      --accent-blocked-bg: rgba(245, 158, 11, 0.12);
+      --accent-info: #3b82f6;
+      --accent-info-bg: rgba(59, 130, 246, 0.12);
+      --radius: 10px;
+      --shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+      --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg-primary);
+      color: var(--text-main);
+      font-family: var(--font);
+      line-height: 1.5;
+      padding: 24px;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 1320px;
+      margin: 0 auto;
+    }
+
+    /* Header */
+    header {
+      background: linear-gradient(135deg, #161b26 0%, #0e131d 100%);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+      padding: 28px 32px;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .brand-title {
+      font-size: 26px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-title span.badge-version {
+      font-size: 12px;
+      font-weight: 600;
+      background: var(--border-color);
+      color: var(--text-muted);
+      padding: 3px 8px;
+      border-radius: 6px;
+      vertical-align: middle;
+    }
+
+    .header-sub {
+      color: var(--text-muted);
+      font-size: 14px;
+      margin-top: 4px;
+    }
+
+    .header-meta {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .meta-item {
+      text-align: right;
+      font-size: 13px;
+    }
+
+    .meta-label { color: var(--text-dim); text-transform: uppercase; font-size: 11px; font-weight: 600; }
+    .meta-val { color: var(--text-main); font-weight: 600; }
+
+    /* KPI Summary Cards */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .kpi-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .kpi-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; bottom: 0;
+      width: 4px;
+      background: var(--card-accent, var(--border-light));
+    }
+
+    .kpi-card.pass { --card-accent: var(--accent-pass); }
+    .kpi-card.fail { --card-accent: var(--accent-fail); }
+    .kpi-card.blocked { --card-accent: var(--accent-blocked); }
+    .kpi-card.rate { --card-accent: #8b5cf6; }
+
+    .kpi-title { font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+    .kpi-value { font-size: 36px; font-weight: 800; margin: 8px 0 4px; line-height: 1; }
+    .kpi-sub { font-size: 12px; color: var(--text-dim); }
+
+    /* Dashboard Visuals Grid */
+    .charts-grid {
+      display: grid;
+      grid-template-columns: 360px 1fr;
+      gap: 20px;
+      margin-bottom: 28px;
+    }
+
+    @media (max-width: 900px) {
+      .charts-grid { grid-template-columns: 1fr; }
+    }
+
+    .chart-panel {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+      padding: 22px;
+      box-shadow: var(--shadow);
+    }
+
+    .panel-header {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: var(--text-main);
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 10px;
+    }
+
+    /* Donut Chart */
+    .donut-container {
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      gap: 16px;
+      padding: 10px 0;
+    }
+
+    .donut-legend {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .legend-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+    }
+
+    .legend-dot {
+      width: 12px; height: 12px; border-radius: 3px;
+    }
+
+    /* Category Progress Bars */
+    .category-list {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .cat-row {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .cat-head {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .cat-progress-bg {
+      height: 8px;
+      background: var(--border-color);
+      border-radius: 4px;
+      overflow: hidden;
+      display: flex;
+    }
+
+    .cat-seg { height: 100%; }
+    .cat-seg.p { background: var(--accent-pass); }
+    .cat-seg.f { background: var(--accent-fail); }
+    .cat-seg.b { background: var(--accent-blocked); }
+
+    /* Controls Bar */
+    .controls-bar {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+      padding: 14px 20px;
+      margin-bottom: 20px;
+      display: flex;
+      gap: 14px;
+      align-items: center;
+      flex-wrap: wrap;
+      box-shadow: var(--shadow);
+    }
+
+    .search-input {
+      flex: 1;
+      min-width: 240px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 10px 14px;
+      border-radius: 6px;
+      font-size: 14px;
+      outline: none;
+      transition: border 0.2s;
+    }
+
+    .search-input:focus { border-color: var(--accent-info); }
+
+    .filter-btn-group {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .filter-btn {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .filter-btn:hover { background: var(--bg-card-hover); color: var(--text-main); }
+    .filter-btn.active {
+      background: var(--accent-info);
+      color: #fff;
+      border-color: var(--accent-info);
+    }
+
+    .filter-btn.pass.active { background: var(--accent-pass); border-color: var(--accent-pass); }
+    .filter-btn.fail.active { background: var(--accent-fail); border-color: var(--accent-fail); }
+    .filter-btn.blocked.active { background: var(--accent-blocked); border-color: var(--accent-blocked); }
+
+    /* Test Case Accordions (Extent Style) */
+    .test-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .test-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+      overflow: hidden;
+      transition: all 0.2s;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .test-card:hover {
+      border-color: var(--border-light);
+    }
+
+    .test-card-header {
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      user-select: none;
+      gap: 16px;
+    }
+
+    .test-card-header:hover {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .test-title-col {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex: 1;
+    }
+
+    .badge-id {
+      font-family: monospace;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-muted);
+      background: var(--bg-card);
+      padding: 4px 8px;
+      border-radius: 4px;
+      border: 1px solid var(--border-color);
+    }
+
+    .test-title-text {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    .test-category-tag {
+      font-size: 12px;
+      color: var(--text-dim);
+      background: rgba(255, 255, 255, 0.04);
+      padding: 3px 8px;
+      border-radius: 4px;
+    }
+
+    .test-meta-col {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .status-badge {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 4px 10px;
+      border-radius: 6px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .status-badge.pass { background: var(--accent-pass-bg); color: var(--accent-pass); border: 1px solid var(--accent-pass); }
+    .status-badge.fail { background: var(--accent-fail-bg); color: var(--accent-fail); border: 1px solid var(--accent-fail); }
+    .status-badge.blocked { background: var(--accent-blocked-bg); color: var(--accent-blocked); border: 1px solid var(--accent-blocked); }
+
+    .chevron {
+      color: var(--text-dim);
+      font-size: 14px;
+      transition: transform 0.2s;
+    }
+
+    .test-card.open .chevron { transform: rotate(180deg); }
+
+    /* Test Body / Step Logs */
+    .test-body {
+      display: none;
+      padding: 0 20px 20px;
+      border-top: 1px solid var(--border-color);
+      background: var(--bg-card);
+    }
+
+    .test-card.open .test-body { display: block; }
+
+    .test-desc {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin: 16px 0;
+      padding-bottom: 12px;
+      border-bottom: 1px dashed var(--border-color);
+    }
+
+    .steps-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 12px 0;
+      font-size: 13px;
+    }
+
+    .steps-table th {
+      text-align: left;
+      padding: 8px 12px;
+      background: rgba(0, 0, 0, 0.2);
+      color: var(--text-dim);
+      font-weight: 600;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .steps-table td {
+      padding: 8px 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      color: var(--text-muted);
+    }
+
+    .step-type-pill {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    .step-type-pill.action { background: var(--accent-info-bg); color: var(--accent-info); }
+    .step-type-pill.assertion { background: rgba(139, 92, 246, 0.15); color: #a78bfa; }
+
+    /* Failure Callout Box */
+    .failure-box {
+      background: rgba(239, 68, 68, 0.08);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      border-left: 4px solid var(--accent-fail);
+      border-radius: 6px;
+      padding: 14px 18px;
+      margin: 16px 0;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .failure-title {
+      color: var(--accent-fail);
+      font-weight: 700;
+      font-size: 14px;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .failure-obs {
+      color: #fca5a5;
+      font-family: monospace;
+      white-space: pre-wrap;
+      background: rgba(0, 0, 0, 0.3);
+      padding: 8px 12px;
+      border-radius: 4px;
+      margin: 8px 0;
+    }
+
+    .failure-fix {
+      color: var(--text-muted);
+      margin-top: 8px;
+    }
+
+    .cloud-link-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 10px;
+      color: var(--accent-info);
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .cloud-link-btn:hover { text-decoration: underline; }
+
+    /* Footer */
+    footer {
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border-color);
+      color: var(--text-dim);
+      font-size: 13px;
+      text-align: center;
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    @media print {
+      body { background: #fff; color: #000; padding: 0; }
+      .test-body { display: block !important; }
+      .controls-bar { display: none; }
+      .kpi-card, .chart-panel, .test-card { border: 1px solid #ccc; box-shadow: none; background: #fff; color: #000; }
+      .badge-id, .test-desc, .steps-table td { color: #333; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- Executive Header -->
+  <header>
+    <div>
+      <div class="brand-title">
+        <span>🌌 Bottomless</span>
+        <span class="badge-version">v1.0.0 PRD Suite</span>
+      </div>
+      <div class="header-sub">
+        Autonomous Test Execution & Quality Assurance Extent Report
+      </div>
+    </div>
+    <div class="header-meta">
+      <div class="meta-item">
+        <div class="meta-label">Execution Engine</div>
+        <div class="meta-val">TestSprite MCP Cloud</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">Environment</div>
+        <div class="meta-val">Vite / Headless Chromium</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">Execution Time</div>
+        <div class="meta-val">12m 05s</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">Date</div>
+        <div class="meta-val">2026-10-05</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Executive KPI Metrics (Extent Style) -->
+  <div class="kpi-grid">
+    <div class="kpi-card rate">
+      <div class="kpi-title">Pass Percentage</div>
+      <div class="kpi-value" style="color: #a78bfa;">80.0%</div>
+      <div class="kpi-sub">20 of 25 Test Scenarios Verified</div>
+    </div>
+    <div class="kpi-card pass">
+      <div class="kpi-title">Passed Tests</div>
+      <div class="kpi-value" style="color: var(--accent-pass);">20</div>
+      <div class="kpi-sub">Mobile, Audio, Pacer & Atlas</div>
+    </div>
+    <div class="kpi-card fail">
+      <div class="kpi-title">Failed Tests</div>
+      <div class="kpi-value" style="color: var(--accent-fail);">4</div>
+      <div class="kpi-sub">Deceleration & Boundary items</div>
+    </div>
+    <div class="kpi-card blocked">
+      <div class="kpi-title">Blocked / Guarded</div>
+      <div class="kpi-value" style="color: var(--accent-blocked);">1</div>
+      <div class="kpi-sub">Invalid theme input impossible</div>
+    </div>
+  </div>
+
+  <!-- Visual Dashboard: Donut & Category Matrix -->
+  <div class="charts-grid">
+    
+    <!-- Donut Chart Card -->
+    <div class="chart-panel">
+      <div class="panel-header">
+        <span>Test Status Distribution</span>
+        <span style="font-size: 12px; color: var(--text-dim);">Total: 25</span>
+      </div>
+      <div class="donut-container">
+        <!-- SVG Donut -->
+        <svg width="150" height="150" viewBox="0 0 42 42" class="donut">
+          <circle class="donut-ring" cx="21" cy="21" r="15.91549430918954" fill="transparent" stroke="#272f40" stroke-width="5"></circle>
+          <!-- Passed 80% (stroke-dasharray="80 20", offset=25) -->
+          <circle cx="21" cy="21" r="15.91549430918954" fill="transparent" stroke="var(--accent-pass)" stroke-width="5" stroke-dasharray="80 20" stroke-dashoffset="25"></circle>
+          <!-- Failed 16% (stroke-dasharray="16 84", offset=-55) -->
+          <circle cx="21" cy="21" r="15.91549430918954" fill="transparent" stroke="var(--accent-fail)" stroke-width="5" stroke-dasharray="16 84" stroke-dashoffset="-55"></circle>
+          <!-- Blocked 4% (stroke-dasharray="4 96", offset=-71) -->
+          <circle cx="21" cy="21" r="15.91549430918954" fill="transparent" stroke="var(--accent-blocked)" stroke-width="5" stroke-dasharray="4 96" stroke-dashoffset="-71"></circle>
+          <g class="donut-text">
+            <text x="50%" y="46%" text-anchor="middle" font-size="7" font-weight="bold" fill="#fff">80%</text>
+            <text x="50%" y="62%" text-anchor="middle" font-size="3" fill="#8b99b5">PASS RATE</text>
+          </g>
+        </svg>
+
+        <div class="donut-legend">
+          <div class="legend-row">
+            <div class="legend-dot" style="background: var(--accent-pass);"></div>
+            <div><strong>20</strong> Passed (80%)</div>
+          </div>
+          <div class="legend-row">
+            <div class="legend-dot" style="background: var(--accent-fail);"></div>
+            <div><strong>4</strong> Failed (16%)</div>
+          </div>
+          <div class="legend-row">
+            <div class="legend-dot" style="background: var(--accent-blocked);"></div>
+            <div><strong>1</strong> Blocked (4%)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Category Progress Breakdown -->
+    <div class="chart-panel">
+      <div class="panel-header">
+        <span>Functional Requirement Breakdown</span>
+        <span style="font-size: 12px; color: var(--text-dim);">6 Core Epics</span>
+      </div>
+      <div class="category-list">
+        
+        <div class="cat-row">
+          <div class="cat-head">
+            <span>Mobile-First Dock & Root Popovers</span>
+            <span style="color: var(--accent-pass); font-weight: 600;">3 / 3 (100%)</span>
+          </div>
+          <div class="cat-progress-bg">
+            <div class="cat-seg p" style="width: 100%;"></div>
+          </div>
+        </div>
+
+        <div class="cat-row">
+          <div class="cat-head">
+            <span>5.5s Resonant HRV Breath Pacer</span>
+            <span style="color: var(--accent-pass); font-weight: 600;">4 / 4 (100%)</span>
+          </div>
+          <div class="cat-progress-bg">
+            <div class="cat-seg p" style="width: 100%;"></div>
+          </div>
+        </div>
+
+        <div class="cat-row">
+          <div class="cat-head">
+            <span>Spatial Landmarks & Discovery Atlas</span>
+            <span style="color: var(--text-main); font-weight: 600;">4 / 5 (80%)</span>
+          </div>
+          <div class="cat-progress-bg">
+            <div class="cat-seg p" style="width: 80%;"></div>
+            <div class="cat-seg f" style="width: 20%;"></div>
+          </div>
+        </div>
+
+        <div class="cat-row">
+          <div class="cat-head">
+            <span>108Hz Harmonic Audio Synthesizer</span>
+            <span style="color: var(--text-main); font-weight: 600;">3 / 4 (75%)</span>
+          </div>
+          <div class="cat-progress-bg">
+            <div class="cat-seg p" style="width: 75%;"></div>
+            <div class="cat-seg f" style="width: 25%;"></div>
+          </div>
+        </div>
+
+        <div class="cat-row">
+          <div class="cat-head">
+            <span>Theme Customization</span>
+            <span style="color: var(--text-main); font-weight: 600;">2 / 3 (67% + 1 Blocked)</span>
+          </div>
+          <div class="cat-progress-bg">
+            <div class="cat-seg p" style="width: 66.6%;"></div>
+            <div class="cat-seg b" style="width: 33.4%;"></div>
+          </div>
+        </div>
+
+        <div class="cat-row">
+          <div class="cat-head">
+            <span>Physics-Driven Infinite Descent</span>
+            <span style="color: var(--text-main); font-weight: 600;">4 / 6 (67%)</span>
+          </div>
+          <div class="cat-progress-bg">
+            <div class="cat-seg p" style="width: 66.7%;"></div>
+            <div class="cat-seg f" style="width: 33.3%;"></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Interactive Controls Bar -->
+  <div class="controls-bar">
+    <input type="text" id="searchInput" class="search-input" placeholder="🔍 Search test cases by title, ID, category or steps...">
+    
+    <div class="filter-btn-group">
+      <button class="filter-btn active" data-filter="all">All (25)</button>
+      <button class="filter-btn pass" data-filter="pass">✅ Passed (20)</button>
+      <button class="filter-btn fail" data-filter="fail">❌ Failed (4)</button>
+      <button class="filter-btn blocked" data-filter="blocked">⏸️ Blocked (1)</button>
+    </div>
+  </div>
+
+  <!-- Test Cases Accordion List -->
+  <div class="test-list" id="testList">
+
+    <!-- TC001 -->
+    <div class="test-card pass" data-status="pass" data-category="Physics-Driven Infinite Descent">
+      <div class="test-card-header" onclick="toggleCard(this)">
+        <div class="test-title-col">
+          <span class="badge-id">TC001</span>
+          <div>
+            <div class="test-title-text">Start descending from the initial view</div>
+            <span class="test-category-tag">Physics-Driven Infinite Descent</span>
+          </div>
+        </div>
+        <div class="test-meta-col">
+          <span class="status-badge pass">Passed</span>
+          <span class="chevron">▼</span>
+        </div>
+      </div>
+      <div class="test-body">
+        <div class="test-desc">Verifies that a new user can load the app and begin a smooth descent with depth and motion responding to scroll input.</div>
+        <table class="steps-table">
+          <thead><tr><th>Type</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><span class="step-type-pill action">Action</span></td><td>Navigate to /</td></tr>
+            <tr><td><span class="step-type-pill action">Action</span></td><td>Scroll down</td></tr>
+            <tr><td><span class="step-type-pill assertion">Assert</span></td><td>Verify the scene shows the user descending</td></tr>
+            <tr><td><span class="step-type-pill assertion">Assert</span></td><td>Verify depth and motion feedback are updating</td></tr>
+          </tbody>
+        </table>
+        <a class="cloud-link-btn" href="https://www.testsprite.com/dashboard/mcp/tests/3fdc294c-8743-5aaf-aa94-d98fb88e1f05/test/7b5ec9e1-efa4-4f1b-8963-242752f5cbf9" target="_blank">🌐 View TestSprite Cloud Recording & Trace ↗</a>
+      </div>
+    </div>
+
+    <!-- TC002 -->
+    <div class="test-card pass" data-status="pass" data-category="108Hz Harmonic Audio Synthesizer">
+      <div class="test-card-header" onclick="toggleCard(this)">
+        <div class="test-title-col">
+          <span class="badge-id">TC002</span>
+          <div>
+            <div class="test-title-text">Mute and restore audio without reloading</div>
+            <span class="test-category-tag">108Hz Harmonic Audio Synthesizer</span>
+          </div>
+        </div>
+        <div class="test-meta-col">
+          <span class="status-badge pass">Passed</span>
+          <span class="chevron">▼</span>
+        </div>
+      </div>
+      <div class="test-body">
+        <div class="test-desc">Verifies that audio can be muted and re-enabled from the UI while the descent view stays intact.</div>
+        <table class="steps-table">
+          <thead><tr><th>Type</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><span class="step-type-pill action">Action</span></td><td>Navigate to /</td></tr>
+            <tr><td><span class="step-type-pill action">Action</span></td><td>Open the sound controls</td></tr>
+            <tr><td><span class="step-type-pill action">Action</span></td><td>Mute audio</td></tr>
+            <tr><td><span class="step-type-pill assertion">Assert</span></td><td>Verify audio is muted</td></tr>
+            <tr><td><span class="step-type-pill action">Action</span></td><td>Unmute audio</td></tr>
+            <tr><td><span class="step-type-pill assertion">Assert</span></td><td>Verify audio is restored</td></tr>
+          </tbody>
+        </table>
+        <a class="cloud-link-btn" href="https://www.testsprite.com/dashboard/mcp/tests/3fdc294c-8743-5aaf-aa94-d98fb88e1f05/test/4d79e8c3-c5cf-4f5e-b276-65ba63109acf" target="_blank">🌐 View TestSprite Cloud Recording & Trace ↗</a>
+      </div>
+    </div>
+
+    <!-- TC003 (FAILED) -->
+    <div class="test-card fail" data-status="fail" data-category="Physics-Driven Infinite Descent">
+      <div class="test-card-header" onclick="toggleCard(this)">
+        <div class="test-title-col">
+          <span class="badge-id">TC003</span>
+          <div>
+            <div class="test-title-text">Enable and stop Zen Float</div>
+            <span class="test-category-tag">Physics-Driven Infinite Descent</span>
+          </div>
+        </div>
+        <div class="test-meta-col">
+          <span class="status-badge fail">Failed</span>
+          <span class="chevron">▼</span>
+        </div>
+      </div>
+      <div class="test-body">
+        <div class="test-desc">Verifies that the auto-descent toggle starts steady floating motion and can be stopped without losing control of the scene.</div>
+        
+        <div class="failure-box">
+          <div class="failure-title">⚠️ Failure Analysis: Auto-Descent Deceleration Rate</div>
+          <div><strong>Observed:</strong> Disabling the auto-descent toggle ('Float') did not stop automatic descent immediately. HUD depth continued to increment over subsequent frames (e.g. 255m → 272m → 349m → 366m) due to damping friction bleed-off.</div>
+          <div class="failure-obs">Assertion Failed: Expected HUD descent to halt immediately upon disabling Float toggle. Inertia damping (0.92) continued forward velocity.</div>
+          <div class="failure-fix"><strong>Recommended Fix:</strong> In <code>physics.ts</code>, when <code>toggleFloatMode()</code> turns off, explicitly set <code>velocity = 0</code> instead of allowing momentum to coast to a stop.</div>
+        </div>
+
+        <table class="steps-table">
+          <thead><tr><th>Type</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><span class="step-type-pill action">Action</span></td><td>Navigate to /</td></tr>
+            <tr><td><span class="step-type-pill action">Action</span></td><td>Scroll down</td></tr>
+            <tr><td><span class="step-type-pill action">Action</span></td><td>Enable auto-descent ('Float')</td></tr>
+            <tr><td><span class="step-type-pill assertion">Assert</span></td><td>Verify scene continues descending automatically</td></tr>
+            <tr><td><span class="step-type-pill action">Action</span></td><td>Disable auto-descent</td></tr>
+            <tr><td><span class="step-type-pill assertion">Assert</span></td><td>Verify automatic descent stops immediately</td></tr>
+          </tbody>
+        </table>
+        <a class="cloud-link-btn" href="https://www.testsprite.com/dashboard/mcp/tests/3fdc294c-8743-5aaf-aa94-d98fb88e1f05/test/d63a2056-782b-4c8d-827b-b3819382be4b" target="_blank">🌐 View TestSprite Cloud Recording & Trace ↗</a>
+      </div>
+    </div>
+
+    <!-- TC004 -->
+    <div class="test-card pass" data-status="pass" data-category="Physics-Driven Infinite Descent">
+      <div class="test-card-header" onclick="toggleCard(this)">
+        <div class="test-title-col">
+          <span class="badge-id">TC004</span>
+          <div>
+            <div class="test-title-text">Continue descending with repeated wheel input</div>
+            <span class="test-category-tag">Physics-Driven Infinite Descent</span>
+          </div>
+        </div>
+        <div class="test-meta-col">
+          <span class="status-badge pass">Passed</span>
+          <span class="chevron">▼</span>
+        </div>
+      </div>
+      <div class="test-body">
+        <div class="test-desc">Verifies that repeated scroll input keeps the descent responsive while motion remains smooth and bounded.</div>
+        <table class="steps-table">
+          <thead><tr><th>Type</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><span class="step-type-pill action">Action</span></td><td>Navigate to /</td></tr>
+            <tr><td><span class="step-type-pill action">Action</span></td><td>Scroll down repeatedly (3x)</td></tr>
+            <tr><td><span class="step-type-pill assertion">Assert</span></td><td>Verify descent continues without losing responsiveness</td></tr>
+            <tr><td><span class="step-type-pill assertion">Assert</span></td><td>Verify motion remains smoothly controlled</td></tr>
+          </tbody>
+        </table>
+        <a class="cloud-link-btn" href="https://www.testsprite.com/dashboard/mcp/tests/3fdc294c-8743-5aaf-aa94-d98fb88e1f05/test/0becaff9-0f7f-4a4e-94ed-ed2a6b3f1664" target="_blank">🌐 View TestSprite Cloud Recording & Trace ↗</a>
+      </div>
+    </div>
+
+    <!-- TC005 -->
+    <div class="test-card pass" data-status="pass" data-category="Mobile-First Dock & Root Popovers">
+      <div class="test-card-header" onclick="toggleCard(this)">
+        <div class="test-title-col">
+          <span class="badge-id">TC005</span>
+          <div>
+            <div class="test-title-text">Use fixed dock to open and dismiss a popover without clipping</div>
+            <span class="test-category-tag">Mobile-First Dock & Root Popovers</span>
+          </div>
+        </div>
+        <div class="test-meta-col">
+          <span class="status-badge pass">Passed</span>
+          <span class="chevron">▼</span>
+        </div>
+      </div>
+      <div class="test-body">
+        <div class="test-desc">Verifies that dock actions open root-level popovers (z-index 1500) and that tapping outside closes them cleanly without clipping the panel.</div>
+        <table class="steps-table">
+          <thead><tr><th>Type</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><span class="step-type-pill action">Action</span></td><td>Navigate to /</td></tr>
+            <tr><td><span class="step-type-pill action">Action</span></td><td>Click Sound control in fixed dock</td></tr>
+            <tr><td><span class="step-type-pill assertion">Assert</span></td><td>Verify sound popover is visible at root level</td></tr>
+            <tr><td><span class="step-type-pill action">Action</span></td><td>Click backdrop outside popover</td></tr>
+            <tr><td><span class="step-type-pill assertion">Assert</span></td><td>Verify sound popover dismisses cleanly</td></tr>
+          </tbody>
+        </table>
+        <a class="cloud-link-btn" href="https://www.testsprite.com/dashboard/mcp/tests/3fdc294c-8743-5aaf-aa94-d98fb88e1f05/test/614119ba-fe50-4548-a815-7cbf72de5b32" target="_blank">🌐 View TestSprite Cloud Recording & Trace ↗</a>
+      </div>
+    </div>
+
+    <!-- TC006 (FAILED) -->
+    <div class="test-card fail" data-status="fail" data-category="Physics-Driven Infinite Descent">
+      <div class="test-card-header" onclick="toggleCard(this)">
+        <div class="test-title-col">
+          <span class="badge-id">TC006</span>
+          <div>
+            <div class="test-title-text">Return to the surface from depth</div>
+            <span class="test-category-tag">Physics-Driven Infinite Descent</span>
+          </div>
+        </div>
+        <div class="test-meta-col">
+          <span class="status-badge fail">Failed</span>
+          <span class="chevron">▼</span>
+        </div>
+      </div>
+      <div class="test-body">
+        <div class="test-desc">Verifies that the surface control brings the user back toward the top with smooth glide physics.</div>
+        
+        <div class="failure-box">
+          <div class="failure-title">⚠️ Failure Analysis: Shallow Depth Glide Threshold</div>
+          <div><strong>Observed:</strong> At shallow depth (HUD was at '7 m'), clicking the central 'The Surface' landmark in the Atlas did not initiate a noticeable reverse glide animation to 0m.</div>
+          <div class="failure-obs">HUD value was '7 m' before activation and remained '7 m' after waiting periods.</div>
+          <div class="failure-fix"><strong>Recommended Fix:</strong> Ensure <code>glideToSurface()</code> enforces a minimum upward velocity impulse even when current depth is &lt; 10m, and explicitly clamps to 0m.</div>
+        </div>
+
+        <table class="steps-table">
+          <thead><tr><th>Type</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><span class="step-type-pill action">Action</span></td><td>Navigate to / and scroll downward</td></tr>
+            <tr><td><span class="step-type-pill action">Action</span></td><td>Activate surface control</td></tr>
+            <tr><td><span class="step-type-pill assertion">Assert</span></td><td>Verify scene glides back toward the surface</td></tr>
+            <tr><td><span class="step-type-pill assertion">Assert</span></td><td>Verify surface state (0m) is reached</td></tr>
+          </tbody>
+        </table>
+        <a class="cloud-link-btn" href="https://www.testsprite.com/dashboard/mcp/tests/3fdc294c-8743-5aaf-aa94-d98fb88e1f05/test/12e1dcdd-5580-4362-b7ca-30d0c6370842" target="_blank">🌐 View TestSprite Cloud Recording & Trace ↗</a>
+      </div>
+    </div>
+
+    <!-- TC007 -->
+    <div class="test-card pass" data-status="pass" data-category="Physics-Driven Infinite Descent">
+      <div class="test-card-header" onclick="toggleCard(this)">
+        <div class="test-title-col">
+          <span class="badge-id">TC007</span>
+          <div>
+            <div class="test-title-text">Use touch drag to descend</div>
+            <span class="test-category-tag">Physics-Driven Infinite Descent</span>
+          </div>
+        </div>
+        <div class="test-meta-col">
+          <span class="status-badge pass">Passed</span>
+          <span class="chevron">▼</span>
+        </div>
+      </div>
+      <div class="test-body">
+        <div class="test-desc">Verifies that a touch user can drive the descent with drag gestures and see the depth state update normally on mobile viewports.</div>
+        <table class="steps-table">
+          <thead><tr><th>Type</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><span class="step-type-pill action">Action</span></td><td>Navigate to /</td></tr>
+            <tr><td><span class="step-type-pill action">Action</span></td><td>Perform downward touch drag gesture</td></tr>
+            <tr><td><span class="step-type-pill assertion">Assert</span></td><td>Verify scene descends in response to touch input</td></tr>
+            <tr><td><span class="step-type-pill assertion">Assert</span></td><td>Verify depth feedback updates during touch drag</td></tr>
+          </tbody>
+        </table>
+        <a class="cloud-link-btn" href="https://www.testsprite.com/dashboard/mcp/tests/3fdc294c-8743-5aaf-aa94-d98fb88e1f05/test/1a7953d6-1f2e-4e59-b20b-682a527b242d" target="_blank">🌐 View TestSprite Cloud Recording & Trace ↗</a>
+      </div>
+    </div>
+
+    <!-- TC008 -->
+    <div class="test-card pass" data-status="pass" data-category="Spatial Landmarks & Discovery Atlas">
+      <div class="test-card-header" onclick="toggleCard(this)">
+        <div class="test-title-col">
+          <span class="badge-id">TC008</span>
+          <div>
+            <div class="test-title-text">Discover a landmark while descending</div>
+            <span class="test-category-tag">Spatial Landmarks & Discovery Atlas</span>
+          </div>
+        </div>
+        <div class="test-meta-col">
+          <span class="status-badge pass">Passed</span>
+          <span class="chevron">▼</span>
+        </div>
+      </div>
+      <div class="test-body">
+        <div class="test-desc">Verifies that descending past a milestone reveals a discovery and saves it to the atlas for later review.</div>
+        <table class="steps-table">
+          <thead><tr><th>Type</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><span class="step-type-pill action">Action</span></td><td>Navigate to /</td></tr>
+            <tr><td><span class="step-type-pill action">Action</span></td><td>Scroll downward until a landmark is reached</td></tr>
+            <tr><td><span class="step-type-pill assertion">Assert</span></td><td>Verify landmark discovery is displayed</td></tr>
+            <tr><td><span class="step-type-pill assertion">Assert</span></td><td>Verify discovery is saved for later access</td></tr>
+          </tbody>
+        </table>
+        <a class="cloud-link-btn" href="https://www.testsprite.com/dashboard/mcp/tests/3fdc294c-8743-5aaf-aa94-d98fb88e1f05/test/3475965e-b6f1-4a15-9225-c41c05981b82" target="_blank">🌐 View TestSprite Cloud Recording & Trace ↗</a>
+      </div>
+    </div>
+
+    <!-- TC009 -->
+    <div class="test-card pass" data-status="pass" data-category="Spatial Landmarks & Discovery Atlas">
+      <div class="test-card-header" onclick="toggleCard(this)">
+        <div class="test-title-col">
+          <span class="badge-id">TC009</span>
+          <div>
+            <div class="test-title-text">Open the atlas and review saved discoveries</div>
+            <span class="test-category-tag">Spatial Landmarks & Discovery Atlas</span>
+          </div>
+        </div>
+        <div class="test-meta-col">
+          <span class="status-badge pass">Passed</span>
+          <span class="chevron">▼</span>
+        </div>
+      </div>
+      <div class="test-body">
+        <div class="test-desc">Verifies that the atlas modal opens from the current session and shows previously discovered landmarks.</div>
+        <table class="steps-table">
+          <thead><tr><th>Type</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><span class="step-type-pill action">Action</span></td><td>Navigate to / and scroll downward</td></tr>
+            <tr><td><span class="step-type-pill action">Action</span></td><td>Click the Atlas control in dock</td></tr>
+            <tr><td><span class="step-type-pill assertion">Assert</span></td><td>Verify atlas modal is visible</td></tr>
+            <tr><td><span class="step-type-pill assertion">Assert</span></td><td>Verify discovered landmarks are listed</td></tr>
+          </tbody>
+        </table>
+        <a class="cloud-link-btn" href="https://www.testsprite.com/dashboard/mcp/tests/3fdc294c-8743-5aaf-aa94-d98fb88e1f05/test/199efc65-e21a-441e-8232-026a357e3b45" target="_blank">🌐 View TestSprite Cloud Recording & Trace ↗</a>
+      </div>
+    </div>
+
+    <!-- TC010 -->
+    <div class="test-card pass" data-status="pass" data-category="108Hz Harmonic Audio Synthesizer">
+      <div class="test-card-header" onclick="toggleCard(this)">
+        <div class="test-title-col">
+          <span class="badge-id">TC010</span>
+          <div>
+            <div class="test-title-text">Open the sound controls and choose a preset</div>
+            <span class="test-category-tag">108Hz Harmonic Audio Synthesizer</span>
+          </div>
+        </div>
+        <div class="test-meta-col">
+          <span class="status-badge pass">Passed</span>
+          <span class="chevron">▼</span>
+        </div>
+      </div>
+      <div class="test-body">
+        <div class="test-desc">Verifies that a user can open the sound menu and select a procedural sound preset that becomes active immediately.</div>
+        <table class="steps-table">
+          <thead><tr><th>Type</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><span class="step-type-pill action">Action</span></td><td>Navigate to / and open sound controls</td></tr>
+            <tr><td><span class="step-type-pill action">Action</span></td><td>Select a valid sound preset ('108Hz Drone' / 'Pink Drift')</td></tr>
+            <tr><td><span class="step-type-pill assertion">Assert</span></td><td>Verify selected sound preset is active</td></tr>
+            <tr><td><span class="step-type-pill assertion">Assert</span></td><td>Verify audio state remains stable while browsing</td></tr>
+          </tbody>
+        </table>
+        <a class="cloud-link-btn" href="https://www.testsprite.com/dashboard/mcp/tests/3fdc294c-8743-5aaf-aa94-d98fb88e1f05/test/0f9a85c0-40c7-478d-afd6-40b0f3f60117" target="_blank">🌐 View TestSprite Cloud Recording & Trace ↗</a>
+      </div>
+    </div>
+
+    <!-- TC011 -->
+    <div class="test-card pass" data-status="pass" data-category="5.5s Resonant HRV Breath Pacer">
+      <div class="test-card-header" onclick="toggleCard(this)">
+        <div class="test-title-col">
+          <span class="badge-id">TC011</span>
+          <div>
+            <div class="test-title-text">Open the breath pacer and follow the breathing rhythm</div>
+            <span class="test-category-tag">5.5s Resonant HRV Breath Pacer</span>
+          </div>
+        </div>
+        <div class="test-meta-col">
+          <span class="status-badge pass">Passed</span>
+          <span class="chevron">▼</span>
+        </div>
+      </div>
+      <div class="test-body">
+        <div class="test-desc">Verifies that the user can open the breathing guide and see the paced inhale-exhale cycle continue during descent.</div>
+        <table class="steps-table">
+          <thead><tr><th>Type</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><span class="step-type-pill action">Action</span></td><td>Navigate to /</td></tr>
+            <tr><td><span class="step-type-pill action">Action</span></td><td>Click Breath control in dock</td></tr>
+            <tr><td><span class="step-type-pill assertion">Assert</span></td><td>Verify breath pacer overlay is visible</td></tr>
+            <tr><td><span class="step-type-pill assertion">Assert</span></td><td>Verify breathing animation cycle is active</td></tr>
+          </tbody>
+        </table>
+        <a class="cloud-link-btn" href="https://www.testsprite.com/dashboard/mcp/tests/3fdc294c-8743-5aaf-aa94-d98fb88e1f05/test/382e3ec6-82e7-4ab5-ac39-1a933f61905f" target="_blank">🌐 View TestSprite Cloud Recording & Trace ↗</a>
+      </div>
+    </div>
+
+    <!-- TC012 -->
+    <div class="test-card pass" data-status="pass" data-category="108Hz Harmonic Audio Synthesizer">
+      <div class="test-card-header" onclick="toggleCard(this)">
+        <div class="test-title-col">
+          <span class="badge-id">TC012</span>
+          <div>
+            <div class="test-title-text">Mute the audio from the dock and keep the mute state stable</div>
+            <span class="test-category-tag">108Hz Harmonic Audio Synthesizer</span>
+          </div>
+        </div>
+        <div class="test-meta-col">
+          <span class="status-badge pass">Passed</span>
+          <span class="chevron">▼</span>
+        </div>
+      </div>
+      <div class="test-body">
+        <div class="test-desc">Verifies that sound controls allow muting procedural audio and keeping that state while continuing to interact with the app.</div>
+        <table class="steps-table">
+          <thead><tr><th>Type</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><span class="step-type-pill action">Action</span></td><td>Click Sound control and mute audio</td></tr>
+            <tr><td><span class="step-type-pill action">Action</span></td><td>Close sound popover</td></tr>
+            <tr><td><span class="step-type-pill assertion">Assert</span></td><td>Verify audio remains muted</td></tr>
+            <tr><td><span class="step-type-pill assertion">Assert</span></td><td>Verify dock controls remain accessible</td></tr>
+          </tbody>
+        </table>
+        <a class="cloud-link-btn" href="https://www.testsprite.com/dashboard/mcp/tests/3fdc294c-8743-5aaf-aa94-d98fb88e1f05/test/c0219460-2c5e-46c9-b157-8aba2d66561e" target="_blank">🌐 View TestSprite Cloud Recording & Trace ↗</a>
+      </div>
+    </div>
+
+    <!-- TC013 -->
+    <div class="test-card pass" data-status="pass" data-category="Theme Customization">
+      <div class="test-card-header" onclick="toggleCard(this)">
+        <div class="test-title-col">
+          <span class="badge-id">TC013</span>
+          <div>
+            <div class="test-title-text">Switch between the available themes</div>
+            <span class="test-category-tag">Theme Customization</span>
+          </div>
+        </div>
+        <div class="test-meta-col">
+          <span class="status-badge pass">Passed</span>
+          <span class="chevron">▼</span>
+        </div>
+      </div>
+      <div class="test-body">
+        <div class="test-desc">Verifies that a user can change the app palette and immediately see the interface recolor between Void, Deep Sea, and Bioluminescence.</div>
+        <table class="steps-table">
+          <thead><tr><th>Type</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><span class="step-type-pill action">Action</span></td><td>Open theme controls popover</td></tr>
+            <tr><td><span class="step-type-pill action">Action</span></td><td>Select a different valid theme</td></tr>
+            <tr><td><span class="step-type-pill assertion">Assert</span></td><td>Verify interface theme attributes change on body</td></tr>
+            <tr><td><span class="step-type-pill assertion">Assert</span></td><td>Verify new palette remains active during browsing</td></tr>
+          </tbody>
+        </table>
+        <a class="cloud-link-btn" href="https://www.testsprite.com/dashboard/mcp/tests/3fdc294c-8743-5aaf-aa94-d98fb88e1f05/test/cb4a3951-02f1-4fc9-9d58-3d415457ca13" target="_blank">🌐 View TestSprite Cloud Recording & Trace ↗</a>
+      </div>
+    </div>
+
+    <!-- TC014 -->
+    <div class="test-card pass" data-status="pass" data-category="5.5s Resonant HRV Breath Pacer">
+      <div class="test-card-header" onclick="toggleCard(this)">
+        <div class="test-title-col">
+          <span class="badge-id">TC014</span>
+          <div>
+            <div class="test-title-text">Pause the breath pacer and return to the default view</div>
+            <span class="test-category-tag">5.5s Resonant HRV Breath Pacer</span>
+          </div>
+        </div>
+        <div class="test-meta-col">
+          <span class="status-badge pass">Passed</span>
+          <span class="chevron">▼</span>
+        </div>
+      </div>
+      <div class="test-body">
+        <div class="test-desc">Verifies that the user can stop the breathing guide and return to the normal HUD without leaving the overlay active.</div>
+        <table class="steps-table">
+          <thead><tr><th>Type</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><span class="step-type-pill action">Action</span></td><td>Click Breath control to activate</td></tr>
+            <tr><td><span class="step-type-pill action">Action</span></td><td>Click Breath control again to dismiss</td></tr>
+            <tr><td><span class="step-type-pill assertion">Assert</span></td><td>Verify breath pacer overlay is hidden</td></tr>
+            <tr><td><span class="step-type-pill assertion">Assert</span></td><td>Verify default HUD view is intact</td></tr>
+          </tbody>
+        </table>
+        <a class="cloud-link-btn" href="https://www.testsprite.com/dashboard/mcp/tests/3fdc294c-8743-5aaf-aa94-d98fb88e1f05/test/a6a8d556-bc98-4a8c-ab3b-b0f3e44424c6" target="_blank">🌐 View TestSprite Cloud Recording & Trace ↗</a>
+      </div>
+    </div>
+
+    <!-- TC015 -->
+    <div class="test-card pass" data-status="pass" data-category="Spatial Landmarks & Discovery Atlas">
+      <div class="test-card-header" onclick="toggleCard(this)">
+        <div class="test-title-col">
+          <span class="badge-id">TC015</span>
+          <div>
+            <div class="test-title-text">Jump to an unlocked depth from the atlas</div>
+            <span class="test-category-tag">Spatial Landmarks & Discovery Atlas</span>
+          </div>
+        </div>
+        <div class="test-meta-col">
+          <span class="status-badge pass">Passed</span>
+          <span class="chevron">▼</span>
+        </div>
+      </div>
+      <div class="test-body">
+        <div class="test-desc">Verifies that a discovered landmark in the atlas can be selected to move the user to that saved depth smoothly.</div>
+        <table class="steps-table">
+          <thead><tr><th>Type</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><span class="step-type-pill action">Action</span></td><td>Open Atlas modal</td></tr>
+            <tr><td><span class="step-type-pill action">Action</span></td><td>Select an unlocked landmark</td></tr>
+            <tr><td><span class="step-type-pill assertion">Assert</span></td><td>Verify user jumps/glides to target depth</td></tr>
+            <tr><td><span class="step-type-pill assertion">Assert</span></td><td>Verify atlas state remains consistent</td></tr>
+          </tbody>
+        </table>
+        <a class="cloud-link-btn" href="https://www.testsprite.com/dashboard/mcp/tests/3fdc294c-8743-5aaf-aa94-d98fb88e1f05/test/30d8ccd5-32be-4e3b-a1e1-3e0fdb6d7fe0" target="_blank">🌐 View TestSprite Cloud Recording & Trace ↗</a>
+      </div>
+    </div>
+
+    <!-- TC016 -->
+    <div class="test-card pass" data-status="pass" data-category="Theme Customization">
+      <div class="test-card-header" onclick="toggleCard(this)">
+        <div class="test-title-col">
+          <span class="badge-id">TC016</span>
+          <div>
+            <div class="test-title-text">Switch theme from dock and keep selection active during descent</div>
+            <span class="test-category-tag">Theme Customization</span>
+          </div>
+        </div>
+        <div class="test-meta-col">
+          <span class="status-badge pass">Passed</span>
+          <span class="chevron">▼</span>
+        </div>
+      </div>
+      <div class="test-body">
+        <div class="test-desc">Verifies that the user can change visual theme from dock and continue descending with the new selection applied.</div>
+        <table class="steps-table">
+          <thead><tr><th>Type</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><span class="step-type-pill action">Action</span></td><td>Click Theme control in fixed dock</td></tr>
+            <tr><td><span class="step-type-pill action">Action</span></td><td>Select a different theme and close popover</td></tr>
+            <tr><td><span class="step-type-pill assertion">Assert</span></td><td>Verify new theme is applied</td></tr>
+            <tr><td><span class="step-type-pill assertion">Assert</span></td><td>Verify dock remains usable and interactive</td></tr>
+          </tbody>
+        </table>
+        <a class="cloud-link-btn" href="https://www.testsprite.com/dashboard/mcp/tests/3fdc294c-8743-5aaf-aa94-d98fb88e1f05/test/33694c64-0c0f-4857-a5b7-689129aa4e66" target="_blank">🌐 View TestSprite Cloud Recording & Trace ↗</a>
+      </div>
+    </div>
+
+    <!-- TC017 (FAILED) -->
+    <div class="test-card fail" data-status="fail" data-category="Spatial Landmarks & Discovery Atlas">
+      <div class="test-card-header" onclick="toggleCard(this)">
+        <div class="test-title-col">
+          <span class="badge-id">TC017</span>
+          <div>
+            <div class="test-title-text">Show an empty atlas on first use</div>
+            <span class="test-category-tag">Spatial Landmarks & Discovery Atlas</span>
+          </div>
+        </div>
+        <div class="test-meta-col">
+          <span class="status-badge fail">Failed</span>
+          <span class="chevron">▼</span>
+        </div>
+      </div>
+      <div class="test-body">
+        <div class="test-desc">This verifies that opening the atlas before any discoveries presents an empty-state experience instead of saved landmarks.</div>
+        
+        <div class="failure-box">
+          <div class="failure-title">⚠️ Failure Analysis: Test Assertion vs Design Philosophy</div>
+          <div><strong>Observed:</strong> The test expected an empty state string ("No milestones found"). Bottomless intentionally seeds "The Surface (0m)" as the origin landmark and displays locked placeholder milestone cards for upcoming discoveries.</div>
+          <div class="failure-obs">Expected: Literal empty string text. Actual: 'Depth Atlas' overlay shows 'The Surface' and locked milestone cards.</div>
+          <div class="failure-fix"><strong>Resolution:</strong> This is intentional application behavior as specified in the PRD. Either update the test assertion or provide an informational subtext: "Begin descending to uncover deeper milestones".</div>
+        </div>
+
+        <table class="steps-table">
+          <thead><tr><th>Type</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><span class="step-type-pill action">Action</span></td><td>Navigate to / on fresh session</td></tr>
+            <tr><td><span class="step-type-pill action">Action</span></td><td>Click Atlas control in dock</td></tr>
+            <tr><td><span class="step-type-pill assertion">Assert</span></td><td>Verify atlas modal is visible</td></tr>
+            <tr><td><span class="step-type-pill assertion">Assert</span></td><td>Verify empty state message is visible</td></tr>
+          </tbody>
+        </table>
+        <a class="cloud-link-btn" href="https://www.testsprite.com/dashboard/mcp/tests/3fdc294c-8743-5aaf-aa94-d98fb88e1f05/test/f0618d61-e296-46ae-968f-58f2014eaabc" target="_blank">🌐 View TestSprite Cloud Recording & Trace ↗</a>
+      </div>
+    </div>
+
+    <!-- TC018 -->
+    <div class="test-card pass" data-status="pass" data-category="5.5s Resonant HRV Breath Pacer">
+      <div class="test-card-header" onclick="toggleCard(this)">
+        <div class="test-title-col">
+          <span class="badge-id">TC018</span>
+          <div>
+            <div class="test-title-text">Continue descending while the breath pacer remains active</div>
+            <span class="test-category-tag">5.5s Resonant HRV Breath Pacer</span>
+          </div>
+        </div>
+        <div class="test-meta-col">
+          <span class="status-badge pass">Passed</span>
+          <span class="chevron">▼</span>
+        </div>
+      </div>
+      <div class="test-body">
+        <div class="test-desc">Verifies that opening the breathing guide does not interrupt descent and the user can keep scrolling while it stays open.</div>
+        <table class="steps-table">
+          <thead><tr><th>Type</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><span class="step-type-pill action">Action</span></td><td>Click Breath control</td></tr>
+            <tr><td><span class="step-type-pill action">Action</span></td><td>Scroll downward</td></tr>
+            <tr><td><span class="step-type-pill assertion">Assert</span></td><td>Verify breath pacer overlay remains visible</td></tr>
+            <tr><td><span class="step-type-pill assertion">Assert</span></td><td>Verify descent state continues smoothly</td></tr>
+          </tbody>
+        </table>
+        <a class="cloud-link-btn" href="https://www.testsprite.com/dashboard/mcp/tests/3fdc294c-8743-5aaf-aa94-d98fb88e1f05/test/0e471130-eac4-4463-9a8d-1734a78e3ee0" target="_blank">🌐 View TestSprite Cloud Recording & Trace ↗</a>
+      </div>
+    </div>
+
+    <!-- TC019 -->
+    <div class="test-card pass" data-status="pass" data-category="Mobile-First Dock & Root Popovers">
+      <div class="test-card-header" onclick="toggleCard(this)">
+        <div class="test-title-col">
+          <span class="badge-id">TC019</span>
+          <div>
+            <div class="test-title-text">Open dock popovers and keep them accessible while scene remains visible</div>
+            <span class="test-category-tag">Mobile-First Dock & Root Popovers</span>
+          </div>
+        </div>
+        <div class="test-meta-col">
+          <span class="status-badge pass">Passed</span>
+          <span class="chevron">▼</span>
+        </div>
+      </div>
+      <div class="test-body">
+        <div class="test-desc">Verifies that dock popovers render above the scene and remain usable instead of being clipped behind the main canvas.</div>
+        <table class="steps-table">
+          <thead><tr><th>Type</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><span class="step-type-pill action">Action</span></td><td>Click Theme control in dock</td></tr>
+            <tr><td><span class="step-type-pill assertion">Assert</span></td><td>Verify theme popover is visible</td></tr>
+            <tr><td><span class="step-type-pill assertion">Assert</span></td><td>Verify main scene remains visible behind popover</td></tr>
+          </tbody>
+        </table>
+        <a class="cloud-link-btn" href="https://www.testsprite.com/dashboard/mcp/tests/3fdc294c-8743-5aaf-aa94-d98fb88e1f05/test/da559179-f8fe-4b5b-8787-ba89f3783b7e" target="_blank">🌐 View TestSprite Cloud Recording & Trace ↗</a>
+      </div>
+    </div>
+
+    <!-- TC020 -->
+    <div class="test-card pass" data-status="pass" data-category="Theme Customization">
+      <div class="test-card-header" onclick="toggleCard(this)">
+        <div class="test-title-col">
+          <span class="badge-id">TC020</span>
+          <div>
+            <div class="test-title-text">Dismiss the theme popover by tapping outside it</div>
+            <span class="test-category-tag">Theme Customization</span>
+          </div>
+        </div>
+        <div class="test-meta-col">
+          <span class="status-badge pass">Passed</span>
+          <span class="chevron">▼</span>
+        </div>
+      </div>
+      <div class="test-body">
+        <div class="test-desc">Verifies that the theme menu can be closed through its backdrop without changing the current palette.</div>
+        <table class="steps-table">
+          <thead><tr><th>Type</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><span class="step-type-pill action">Action</span></td><td>Open theme controls popover</td></tr>
+            <tr><td><span class="step-type-pill action">Action</span></td><td>Tap outside the open theme popover on backdrop</td></tr>
+            <tr><td><span class="step-type-pill assertion">Assert</span></td><td>Verify theme popover closes</td></tr>
+            <tr><td><span class="step-type-pill assertion">Assert</span></td><td>Verify active theme does not change</td></tr>
+          </tbody>
+        </table>
+        <a class="cloud-link-btn" href="https://www.testsprite.com/dashboard/mcp/tests/3fdc294c-8743-5aaf-aa94-d98fb88e1f05/test/03ff13f6-2435-42df-b10c-b54aff32f418" target="_blank">🌐 View TestSprite Cloud Recording & Trace ↗</a>
+      </div>
+    </div>
+
+    <!-- TC021 -->
+    <div class="test-card pass" data-status="pass" data-category="5.5s Resonant HRV Breath Pacer">
+      <div class="test-card-header" onclick="toggleCard(this)">
+        <div class="test-title-col">
+          <span class="badge-id">TC021</span>
+          <div>
+            <div class="test-title-text">Keep the breath pacer stable during rapid toggling</div>
+            <span class="test-category-tag">5.5s Resonant HRV Breath Pacer</span>
+          </div>
+        </div>
+        <div class="test-meta-col">
+          <span class="status-badge pass">Passed</span>
+          <span class="chevron">▼</span>
+        </div>
+      </div>
+      <div class="test-body">
+        <div class="test-desc">Verifies that repeated quick toggles do not break the breathing guide or cause inconsistent visual state.</div>
+        <table class="steps-table">
+          <thead><tr><th>Type</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><span class="step-type-pill action">Action</span></td><td>Rapidly click Breath control 4x</td></tr>
+            <tr><td><span class="step-type-pill assertion">Assert</span></td><td>Verify breathing animation is not glitching</td></tr>
+            <tr><td><span class="step-type-pill assertion">Assert</span></td><td>Verify default HUD state remains consistent</td></tr>
+          </tbody>
+        </table>
+        <a class="cloud-link-btn" href="https://www.testsprite.com/dashboard/mcp/tests/3fdc294c-8743-5aaf-aa94-d98fb88e1f05/test/34c7f9a3-ddce-4084-9b19-46d1b3c6f24f" target="_blank">🌐 View TestSprite Cloud Recording & Trace ↗</a>
+      </div>
+    </div>
+
+    <!-- TC022 -->
+    <div class="test-card pass" data-status="pass" data-category="Physics-Driven Infinite Descent">
+      <div class="test-card-header" onclick="toggleCard(this)">
+        <div class="test-title-col">
+          <span class="badge-id">TC022</span>
+          <div>
+            <div class="test-title-text">Clamp aggressive input to stable motion</div>
+            <span class="test-category-tag">Physics-Driven Infinite Descent</span>
+          </div>
+        </div>
+        <div class="test-meta-col">
+          <span class="status-badge pass">Passed</span>
+          <span class="chevron">▼</span>
+        </div>
+      </div>
+      <div class="test-body">
+        <div class="test-desc">Verifies that aggressive input is clamped cleanly and descent remains stable without overscroll behavior or NaN velocities.</div>
+        <table class="steps-table">
+          <thead><tr><th>Type</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><span class="step-type-pill action">Action</span></td><td>Perform very large downward scroll input</td></tr>
+            <tr><td><span class="step-type-pill action">Action</span></td><td>Press unsupported keys</td></tr>
+            <tr><td><span class="step-type-pill assertion">Assert</span></td><td>Verify descent remains responsive and bounded to terminal velocity</td></tr>
+            <tr><td><span class="step-type-pill assertion">Assert</span></td><td>Verify no overscroll or visual glitch appears</td></tr>
+          </tbody>
+        </table>
+        <a class="cloud-link-btn" href="https://www.testsprite.com/dashboard/mcp/tests/3fdc294c-8743-5aaf-aa94-d98fb88e1f05/test/014c165c-1f2b-4629-b835-875d80dc3641" target="_blank">🌐 View TestSprite Cloud Recording & Trace ↗</a>
+      </div>
+    </div>
+
+    <!-- TC023 -->
+    <div class="test-card pass" data-status="pass" data-category="Spatial Landmarks & Discovery Atlas">
+      <div class="test-card-header" onclick="toggleCard(this)">
+        <div class="test-title-col">
+          <span class="badge-id">TC023</span>
+          <div>
+            <div class="test-title-text">Keep locked atlas entries unavailable before discovery</div>
+            <span class="test-category-tag">Spatial Landmarks & Discovery Atlas</span>
+          </div>
+        </div>
+        <div class="test-meta-col">
+          <span class="status-badge pass">Passed</span>
+          <span class="chevron">▼</span>
+        </div>
+      </div>
+      <div class="test-body">
+        <div class="test-desc">Verifies that undiscovered depths cannot be selected and the user stays at current depth until milestones are reached.</div>
+        <table class="steps-table">
+          <thead><tr><th>Type</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><span class="step-type-pill action">Action</span></td><td>Open Atlas modal</td></tr>
+            <tr><td><span class="step-type-pill action">Action</span></td><td>Attempt to click locked milestone card</td></tr>
+            <tr><td><span class="step-type-pill assertion">Assert</span></td><td>Verify locked entries cannot be opened or jumped to</td></tr>
+            <tr><td><span class="step-type-pill assertion">Assert</span></td><td>Verify current depth remains unchanged</td></tr>
+          </tbody>
+        </table>
+        <a class="cloud-link-btn" href="https://www.testsprite.com/dashboard/mcp/tests/3fdc294c-8743-5aaf-aa94-d98fb88e1f05/test/2756bd21-9ca0-4377-a504-cf97e14f26d9" target="_blank">🌐 View TestSprite Cloud Recording & Trace ↗</a>
+      </div>
+    </div>
+
+    <!-- TC024 (FAILED) -->
+    <div class="test-card fail" data-status="fail" data-category="108Hz Harmonic Audio Synthesizer">
+      <div class="test-card-header" onclick="toggleCard(this)">
+        <div class="test-title-col">
+          <span class="badge-id">TC024</span>
+          <div>
+            <div class="test-title-text">Ignore an unsupported sound preset</div>
+            <span class="test-category-tag">108Hz Harmonic Audio Synthesizer</span>
+          </div>
+        </div>
+        <div class="test-meta-col">
+          <span class="status-badge fail">Failed</span>
+          <span class="chevron">▼</span>
+        </div>
+      </div>
+      <div class="test-body">
+        <div class="test-desc">Verifies that choosing an invalid sound option leaves the current audio state unchanged and the interface remains stable.</div>
+        
+        <div class="failure-box">
+          <div class="failure-title">⚠️ Failure Analysis: Test Generator Assumption Mismatch</div>
+          <div><strong>Observed:</strong> The AI test script assumed "Singing Bowl" was an unsupported preset and clicked it, expecting the app to ignore the click. However, the button had active styling and correctly responded.</div>
+          <div class="failure-obs">Test clicked 'Singing Bowl'; observed preset-btn active class applied. Controls and volume slider stayed 100% stable.</div>
+          <div class="failure-fix"><strong>Resolution:</strong> The audio synthesizer handles presets via fixed enumerations; there are no unbound free-text preset selectors. Update the test plan to reflect that all visible buttons are valid presets.</div>
+        </div>
+
+        <table class="steps-table">
+          <thead><tr><th>Type</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><span class="step-type-pill action">Action</span></td><td>Open sound controls popover</td></tr>
+            <tr><td><span class="step-type-pill action">Action</span></td><td>Attempt to select an unsupported sound preset</td></tr>
+            <tr><td><span class="step-type-pill assertion">Assert</span></td><td>Verify current sound preset remains active</td></tr>
+            <tr><td><span class="step-type-pill assertion">Assert</span></td><td>Verify sound controls stay usable</td></tr>
+          </tbody>
+        </table>
+        <a class="cloud-link-btn" href="https://www.testsprite.com/dashboard/mcp/tests/3fdc294c-8743-5aaf-aa94-d98fb88e1f05/test/9211ed34-4c49-4033-ae00-87351120f6ac" target="_blank">🌐 View TestSprite Cloud Recording & Trace ↗</a>
+      </div>
+    </div>
+
+    <!-- TC025 (BLOCKED) -->
+    <div class="test-card blocked" data-status="blocked" data-category="Theme Customization">
+      <div class="test-card-header" onclick="toggleCard(this)">
+        <div class="test-title-col">
+          <span class="badge-id">TC025</span>
+          <div>
+            <div class="test-title-text">Ignore an unsupported theme choice</div>
+            <span class="test-category-tag">Theme Customization</span>
+          </div>
+        </div>
+        <div class="test-meta-col">
+          <span class="status-badge blocked">Blocked</span>
+          <span class="chevron">▼</span>
+        </div>
+      </div>
+      <div class="test-body">
+        <div class="test-desc">Verifies that invalid theme input is ignored cleanly and the previous palette stays active.</div>
+        
+        <div class="failure-box" style="border-left-color: var(--accent-blocked); background: rgba(245, 158, 11, 0.08);">
+          <div class="failure-title" style="color: var(--accent-blocked);">⏸️ Test Blocked by Strict UI Constraints</div>
+          <div><strong>Reason:</strong> The test runner could not execute because Bottomless exposes strictly three fixed palette buttons ("Void", "Deep Sea", "Bioluminescence"). There is no input field, URL query injection, or file upload to submit an unsupported theme value.</div>
+          <div class="failure-obs">UI exposes no free-form input; only preset buttons exist. Interface remains locked to valid design system palettes.</div>
+          <div class="failure-fix"><strong>Assessment:</strong> This is a positive architectural constraint. The UI design naturally prevents invalid state corruption.</div>
+        </div>
+
+        <table class="steps-table">
+          <thead><tr><th>Type</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><span class="step-type-pill action">Action</span></td><td>Open theme controls popover</td></tr>
+            <tr><td><span class="step-type-pill action">Action</span></td><td>Attempt to select an unsupported theme</td></tr>
+            <tr><td><span class="step-type-pill assertion">Assert</span></td><td>Verify active theme remains unchanged</td></tr>
+            <tr><td><span class="step-type-pill assertion">Assert</span></td><td>Verify interface continues rendering normally</td></tr>
+          </tbody>
+        </table>
+        <a class="cloud-link-btn" href="https://www.testsprite.com/dashboard/mcp/tests/3fdc294c-8743-5aaf-aa94-d98fb88e1f05/test/c3974d00-7bc2-40d7-9e4e-545b961caf69" target="_blank">🌐 View TestSprite Cloud Recording & Trace ↗</a>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <div>Bottomless Quality Engineering — Generated automatically by TestSprite AI + Antigravity</div>
+    <div>Live Deployment: <a href="https://naveenchandaka47-cmyk.github.io/bottomless/" target="_blank" style="color: var(--accent-info); text-decoration: none;">GitHub Pages</a></div>
+  </footer>
+
+</div>
+
+<script>
+  // Accordion toggle
+  function toggleCard(header) {
+    const card = header.closest('.test-card');
+    card.classList.toggle('open');
+  }
+
+  // Filter Buttons
+  const filterBtns = document.querySelectorAll('.filter-btn');
+  const cards = document.querySelectorAll('.test-card');
+  const searchInput = document.getElementById('searchInput');
+
+  let activeFilter = 'all';
+
+  filterBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      filterBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      activeFilter = btn.dataset.filter;
+      applyFilters();
+    });
+  });
+
+  searchInput.addEventListener('input', applyFilters);
+
+  function applyFilters() {
+    const query = searchInput.value.toLowerCase().trim();
+
+    cards.forEach(card => {
+      const status = card.dataset.status;
+      const text = card.textContent.toLowerCase();
+
+      const matchesStatus = (activeFilter === 'all') || (status === activeFilter);
+      const matchesSearch = !query || text.includes(query);
+
+      if (matchesStatus && matchesSearch) {
+        card.style.display = 'block';
+      } else {
+        card.style.display = 'none';
+      }
+    });
+  }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,739 @@
+[
+  {
+    "id": "TC001",
+    "title": "Start descending from the initial view",
+    "description": "Verifies that a new user can load the app and begin a smooth descent with depth and motion responding to scroll input.",
+    "category": "Physics-Driven Infinite Descent",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Scroll down"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the scene shows the user descending"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify depth and motion feedback are updating"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC002",
+    "title": "Mute and restore audio without reloading",
+    "description": "Verifies that audio can be muted and re-enabled from the UI while the descent view stays intact.",
+    "category": "108Hz Harmonic Audio Synthesizer",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Open the sound controls"
+      },
+      {
+        "type": "action",
+        "description": "Mute audio"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify audio is muted"
+      },
+      {
+        "type": "action",
+        "description": "Unmute audio"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify audio is restored"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC003",
+    "title": "Enable and stop Zen Float",
+    "description": "Verifies that the auto-descent toggle starts steady floating motion and can be stopped without losing control of the scene.",
+    "category": "Physics-Driven Infinite Descent",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Scroll down"
+      },
+      {
+        "type": "action",
+        "description": "Enable auto-descent"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the scene continues descending automatically"
+      },
+      {
+        "type": "action",
+        "description": "Disable auto-descent"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify automatic descent stops"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC004",
+    "title": "Continue descending with repeated wheel input",
+    "description": "Verifies that repeated scroll input keeps the descent responsive while motion remains smooth and bounded.",
+    "category": "Physics-Driven Infinite Descent",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Scroll down"
+      },
+      {
+        "type": "action",
+        "description": "Scroll down again"
+      },
+      {
+        "type": "action",
+        "description": "Scroll down once more"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the descent continues without losing responsiveness"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify motion remains smoothly controlled"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC005",
+    "title": "Use the fixed dock to open and dismiss a popover without clipping",
+    "description": "This verifies that dock actions open root-level popovers and that tapping outside closes them cleanly without clipping the panel.",
+    "category": "Mobile-First Dock & Root Popovers",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Click the Sound control in the fixed dock"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the sound popover is visible"
+      },
+      {
+        "type": "action",
+        "description": "Click the backdrop outside the popover"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the sound popover is not visible"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC006",
+    "title": "Return to the surface from depth",
+    "description": "Verifies that the surface control brings the user back toward the top with smooth glide physics.",
+    "category": "Physics-Driven Infinite Descent",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Scroll down"
+      },
+      {
+        "type": "action",
+        "description": "Scroll down again"
+      },
+      {
+        "type": "action",
+        "description": "Activate the surface control"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the scene glides back toward the surface"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the surface state is reached"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC007",
+    "title": "Use touch drag to descend",
+    "description": "Verifies that a touch user can drive the descent with drag gestures and see the depth state update normally.",
+    "category": "Physics-Driven Infinite Descent",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Perform a downward touch drag"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the scene descends in response to touch input"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify depth feedback updates during the drag"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC008",
+    "title": "Discover a landmark while descending",
+    "description": "This verifies that descending past a milestone reveals a discovery and saves it to the atlas for later review.",
+    "category": "Spatial Landmarks & Discovery Atlas",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Scroll downward until a landmark is reached"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a landmark discovery is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the discovery is saved for later access"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC009",
+    "title": "Open the atlas and review saved discoveries",
+    "description": "This verifies that the atlas modal opens from the current session and shows previously discovered landmarks.",
+    "category": "Spatial Landmarks & Discovery Atlas",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Scroll downward until a landmark is reached"
+      },
+      {
+        "type": "action",
+        "description": "Click the Atlas control"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the atlas modal is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify discovered landmarks are listed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC010",
+    "title": "Open the sound controls and choose a preset",
+    "description": "Verifies that a user can open the sound menu and select a procedural sound preset that becomes active immediately.",
+    "category": "108Hz Harmonic Audio Synthesizer",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Open the sound controls"
+      },
+      {
+        "type": "action",
+        "description": "Select a valid sound preset"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the selected sound preset is active"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the audio state remains stable while browsing"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC011",
+    "title": "Open the breath pacer and follow the breathing rhythm",
+    "description": "This verifies that the user can open the breathing guide and see the paced inhale-exhale cycle continue during descent.",
+    "category": "5.5s Resonant HRV Breath Pacer",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Click the Breath control"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the breath pacer overlay is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the breathing animation is displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC012",
+    "title": "Mute the audio from the dock and keep the mute state stable",
+    "description": "This verifies that the sound controls allow the user to mute procedural audio and keep that state while continuing to interact with the app.",
+    "category": "Mobile-First Dock & Root Popovers",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Click the Sound control in the fixed dock"
+      },
+      {
+        "type": "action",
+        "description": "Mute the sound output"
+      },
+      {
+        "type": "action",
+        "description": "Close the sound popover"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify audio is muted"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the dock controls remain accessible"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC013",
+    "title": "Switch between the available themes",
+    "description": "Verifies that a user can change the app palette and immediately see the interface recolor.",
+    "category": "Theme Customization",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Open the theme controls"
+      },
+      {
+        "type": "action",
+        "description": "Select a different valid theme"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the interface theme changes"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the new palette remains active during continued browsing"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC014",
+    "title": "Pause the breath pacer and return to the default view",
+    "description": "This verifies that the user can stop the breathing guide and return to the normal HUD without leaving the overlay active.",
+    "category": "5.5s Resonant HRV Breath Pacer",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Click the Breath control"
+      },
+      {
+        "type": "action",
+        "description": "Click the Breath control again"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the breath pacer overlay is not visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the default HUD is visible"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC015",
+    "title": "Jump to an unlocked depth from the atlas",
+    "description": "This verifies that a discovered landmark in the atlas can be selected to move the user to that saved depth.",
+    "category": "Spatial Landmarks & Discovery Atlas",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Scroll downward until a landmark is reached"
+      },
+      {
+        "type": "action",
+        "description": "Click the Atlas control"
+      },
+      {
+        "type": "action",
+        "description": "Select a discovered landmark"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the user jumps to the selected depth"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the atlas remains consistent after the jump"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC016",
+    "title": "Switch theme from the dock and keep the selection active during descent",
+    "description": "This verifies that the user can change the visual theme from the dock and continue descending with the new selection applied.",
+    "category": "Mobile-First Dock & Root Popovers",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Click the Theme control in the fixed dock"
+      },
+      {
+        "type": "action",
+        "description": "Select a different theme"
+      },
+      {
+        "type": "action",
+        "description": "Close the theme popover"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the new theme is applied"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the dock remains usable"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC017",
+    "title": "Show an empty atlas on first use",
+    "description": "This verifies that opening the atlas before any discoveries presents an empty-state experience instead of saved landmarks.",
+    "category": "Spatial Landmarks & Discovery Atlas",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Click the Atlas control"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the atlas modal is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify an empty state message is visible"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC018",
+    "title": "Continue descending while the breath pacer remains active",
+    "description": "This verifies that opening the breathing guide does not interrupt the current descent state and the user can keep scrolling while it stays open.",
+    "category": "5.5s Resonant HRV Breath Pacer",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Click the Breath control"
+      },
+      {
+        "type": "action",
+        "description": "Scroll downward"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the breath pacer overlay remains visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the descent state continues"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC019",
+    "title": "Open dock popovers and keep them accessible while the scene remains visible",
+    "description": "This verifies that dock popovers render above the scene and remain usable instead of being clipped behind the main canvas.",
+    "category": "Mobile-First Dock & Root Popovers",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Click the Theme control in the fixed dock"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the theme popover is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the main scene remains visible behind the popover"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC020",
+    "title": "Dismiss the theme popover by tapping outside it",
+    "description": "Verifies that the theme menu can be closed through its backdrop without changing the current palette.",
+    "category": "Theme Customization",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Open the theme controls"
+      },
+      {
+        "type": "action",
+        "description": "Tap outside the open theme popover"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the theme popover closes"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the active theme does not change"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC021",
+    "title": "Keep the breath pacer stable during rapid toggling",
+    "description": "This verifies that repeated quick toggles do not break the breathing guide or cause inconsistent visual state.",
+    "category": "5.5s Resonant HRV Breath Pacer",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Click the Breath control"
+      },
+      {
+        "type": "action",
+        "description": "Click the Breath control again"
+      },
+      {
+        "type": "action",
+        "description": "Click the Breath control"
+      },
+      {
+        "type": "action",
+        "description": "Click the Breath control again"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the breathing animation is not glitching"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the default HUD state remains consistent"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC022",
+    "title": "Clamp aggressive input to stable motion",
+    "description": "Verifies that very aggressive input is handled cleanly and the descent remains stable without overscroll behavior.",
+    "category": "Physics-Driven Infinite Descent",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Perform a very large downward scroll input"
+      },
+      {
+        "type": "action",
+        "description": "Press an unsupported key"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the descent remains responsive and bounded"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify no overscroll or visual glitch appears"
+      }
+    ],
+    "priority": "Low"
+  },
+  {
+    "id": "TC023",
+    "title": "Keep locked atlas entries unavailable before discovery",
+    "description": "This verifies that undiscovered depths cannot be selected and the user stays at the current depth until they are earned.",
+    "category": "Spatial Landmarks & Discovery Atlas",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Click the Atlas control"
+      },
+      {
+        "type": "action",
+        "description": "Select a locked landmark entry if shown"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify locked entries cannot be opened"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the current depth remains unchanged"
+      }
+    ],
+    "priority": "Low"
+  },
+  {
+    "id": "TC024",
+    "title": "Ignore an unsupported sound preset",
+    "description": "Verifies that choosing an invalid sound option leaves the current audio state unchanged and the interface remains stable.",
+    "category": "108Hz Harmonic Audio Synthesizer",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Open the sound controls"
+      },
+      {
+        "type": "action",
+        "description": "Attempt to select an unsupported sound preset"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the current sound preset remains active"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the sound controls stay usable"
+      }
+    ],
+    "priority": "Low"
+  },
+  {
+    "id": "TC025",
+    "title": "Ignore an unsupported theme choice",
+    "description": "Verifies that invalid theme input is ignored cleanly and the previous palette stays active.",
+    "category": "Theme Customization",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Open the theme controls"
+      },
+      {
+        "type": "action",
+        "description": "Attempt to select an unsupported theme"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the active theme remains unchanged"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the interface continues rendering normally"
+      }
+    ],
+    "priority": "Low"
+  }
+]
